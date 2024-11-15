@@ -63,5 +63,5 @@ gem 'devise'
 gem 'cancancan'
 gem 'draper'
 gem 'pundit'
-
+gem "sassc-rails"
 
