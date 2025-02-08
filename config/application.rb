@@ -23,5 +23,13 @@ module BigProject
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    config.generators do |g|
+      g.test_framework :rspec # Set RSpec as the default
+      g.skip_routes true # Skip routes generation (optional)
+      g.stylesheets false # Skip stylesheet generation (optional)
+      g.javascripts false # Skip javascript generation (optional)
+      g.helper false # Skip helper generation (optional)
+    end
   end
 end
