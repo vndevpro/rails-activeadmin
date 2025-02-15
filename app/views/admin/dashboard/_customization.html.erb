@@ -1,0 +1,144 @@
+<style>
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 30% 15%;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    /* Hide default radio buttons */
+    .radio-group input[type="radio"] {
+        display: none;
+    }
+
+    /* Style the labels to look like buttons */
+    .radio-btn {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px;
+        font-size: 14px;
+        border: 1px solid #838a90;
+        background: white;
+        color: #838a90;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    /* Change appearance when selected */
+    .radio-group input[type="radio"]:checked + .radio-btn {
+        background: #838a90;
+        color: white;
+    }
+
+    /* Hover effect */
+    .radio-btn:hover {
+        background: #838a90;
+        color: white;
+    }
+</style>
+
+<%= form_with url: admin_dashboard_path, method: :get, html: { class: "form-horizontal" } do |f| %>
+    <fieldset class="inputs">
+        <legend class="fieldset-title">
+            <span>Customize The Dashboard</span>
+        </legend>
+        <div class="form-grid">
+            <div class="form-group">
+                <%= f.label :from, "Filter From" %>
+                <%= f.text_field :from, value: Admin::CustomizationHelper.parse_date(params[:from], Date.today.last_year), id: 'from_date' %>
+            </div>
+            <div class="form-group">
+                <%= f.label :to, "To" %>
+                <%= f.text_field :to, value: Admin::CustomizationHelper.parse_date(params[:to], Date.today), id: 'to_date' %>
+            </div>
+            <div class="form-group">
+                <%= f.label :chart_type, "Chart Type" %>
+                <div class="radio-group">
+                    <%= f.radio_button :chart_type, "line", id: "chart_type_line", checked: !Admin::CustomizationHelper.is_bar_chart(params[:chart_type]) %>
+                    <%= f.label :chart_type_line, "Line", class: "radio-btn" %>
+                
+                    <%= f.radio_button :chart_type, "bar", id: "chart_type_bar", checked: Admin::CustomizationHelper.is_bar_chart(params[:chart_type]) %>
+                    <%= f.label :chart_type_bar, "Bar", class: "radio-btn" %>
+                </div>
+            </div>
+            <div class="form-group">
+                <%= f.label :group, "Group By" %>
+                <div class="radio-group">
+                    <%= f.radio_button :group, "day", id: "group_day", checked: Admin::CustomizationHelper.parse_group(params[:group]) == 'day' %>
+                    <%= f.label :group_day, "Day", class: "radio-btn" %>
+                
+                    <%= f.radio_button :group, "week", id: "group_week", checked: Admin::CustomizationHelper.parse_group(params[:group]) == 'week' %>
+                    <%= f.label :group_week, "Week", class: "radio-btn" %>
+
+                    <%= f.radio_button :group, "month", id: "group_month", checked: Admin::CustomizationHelper.parse_group(params[:group]) == 'month' %>
+                    <%= f.label :group_month, "Month", class: "radio-btn" %>
+
+                    <%= f.radio_button :group, "year", id: "group_year", checked: Admin::CustomizationHelper.parse_group(params[:group]) == 'year' %>
+                    <%= f.label :group_year, "Year", class: "radio-btn" %>
+                </div>
+            </div>
+            <div class="form-group">
+                <%= f.submit "Apply" %>
+            </div>
+        </ol>
+    </fieldset>
+<% end %>
+
+<script>
+  $(document).ready(function() {
+    let $from_date = $("#from_date")
+    let $to_date = $("#to_date")
+
+    $from_date.datepicker({
+        dateFormat: "yy-mm-dd",
+        onSelect: function(selectedDate) {
+            updateToDateMin()
+        }
+    });
+    $from_date.on("change", function() {
+        updateToDateMin();
+    });
+
+    $to_date.datepicker({
+        dateFormat: "yy-mm-dd",
+        onSelect: function(selectedDate) {
+            updateFromDateMax();
+        }
+    });
+    $from_date.on("change", function() {
+        updateFromDateMax();
+    });
+
+    if ($from_date.val() !== "") {
+        updateToDateMin();
+    }
+    if ($to_date.val() !== "") {
+        updateFromDateMax();
+    }
+
+    function updateToDateMin() {
+        let selectedDate = $from_date.val();
+        if (selectedDate === "") {
+            $to_date.datepicker("option", "minDate", null);
+        } else {
+            $to_date.datepicker("option", "minDate", selectedDate);
+        }
+    }
+
+    function updateFromDateMax() {
+        let selectedDate = $to_date.val();
+        if (selectedDate === "") {
+            $from_date.datepicker("option", "maxDate", null);
+        } else {
+            $from_date.datepicker("option", "maxDate", selectedDate);
+        }
+    }
+  });
+</script>

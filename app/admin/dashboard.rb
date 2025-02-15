@@ -2,6 +2,10 @@
 ActiveAdmin.register_page "Dashboard" do
   menu priority: 1, label: proc { I18n.t("active_admin.dashboard") }
 
+  controller do
+    include Admin::DashboardHelper
+  end
+
   content title: proc { I18n.t("active_admin.dashboard") } do
     div class: "blank_slate_container", id: "dashboard_default_message" do
       span class: "blank_slate" do
@@ -10,24 +14,26 @@ ActiveAdmin.register_page "Dashboard" do
       end
     end
 
-    # Here is an example of a simple dashboard with columns and panels.
-    #
-    # columns do
-    #   column do
-    #     panel "Recent Posts" do
-    #       ul do
-    #         Post.recent(5).map do |post|
-    #           li link_to(post.title, admin_post_path(post))
-    #         end
-    #       end
-    #     end
-    #   end
+    render partial: 'admin/dashboard/customization'
 
-    #   column do
-    #     panel "Info" do
-    #       para "Welcome to ActiveAdmin."
-    #     end
-    #   end
-    # end
+    from_date = Admin::CustomizationHelper.parse_date(params[:from], Date.today.last_year)
+    to_date = Admin::CustomizationHelper.parse_date(params[:to], Date.today)
+    is_bar_chart = Admin::CustomizationHelper.is_bar_chart(params[:chart_type])
+
+    columns do
+      column do
+        panel "Recent Posts" do
+          
+        end
+      end
+
+      column do
+        panel "System Info" do
+          para "Latest Migration: #{latest_migration}"
+          para "Ruby Version: #{RUBY_VERSION}"
+          para "Rails Version: #{Rails.version}"
+        end
+      end
+    end
   end # content
 end
